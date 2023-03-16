@@ -10,8 +10,8 @@
     <div class="right-menu">
       <el-dropdown class="avatar-container" trigger="click">
         <div class="avatar-wrapper">
-          <img src="@/assets/common/bigUserHeader.png" class="user-avatar">
-          <span class="name">管理员</span>
+          <img v-imagerror="defaultImg" :src="$store.state.user.staffInfo.staffPhoto" class="user-avatar">
+          <span class="name">{{ name }}</span>
           <i class="el-icon-caret-bottom" style="color:#fff" />
         </div>
         <el-dropdown-menu slot="dropdown" class="user-dropdown">
@@ -20,7 +20,7 @@
               首页
             </el-dropdown-item>
           </router-link>
-          <a target="_blank" href="https://github.com/zhou-xiao-chen/hrsaas-zxc.git">
+          <a target="_blank" href="https://github.com/zhou-xiao-chen/new-hrsaas.git">
             <el-dropdown-item>项目地址</el-dropdown-item>
           </a>
           <el-dropdown-item divided @click.native="logout">
@@ -42,19 +42,26 @@ export default {
     // Breadcrumb,
     Hamburger
   },
+  data () {
+    return {
+      defaultImg: require('@/assets/common/head.jpg')
+    }
+  },
   computed: {
     ...mapGetters([
       'sidebar',
-      'avatar'
+      'avatar',
+      'name'
     ])
   },
   methods: {
     toggleSideBar () {
       this.$store.dispatch('app/toggleSideBar')
     },
-    async logout () {
-      await this.$store.dispatch('user/logout')
-      this.$router.push(`/login?redirect=${this.$route.fullPath}`)
+    logout () {
+      this.$store.commit('user/removeToken')
+      this.$store.commit('user/removeUserInfo')
+      this.$router.push('/login')
     }
   }
 }
