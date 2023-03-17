@@ -8,7 +8,7 @@
         <div class="tree-card">
           <TreeTools :tree-data="company" :is-dropdown-show="true" />
           <el-tree :data="departs" :props="defaultProps" :default-expand-all="true">
-            <TreeTools slot-scope="{ data }" :tree-data="data" />
+            <TreeTools slot-scope="{ data }" :tree-data="data" @deldepart="getCompanyLists" />
           </el-tree>
         </div>
       </el-card>
@@ -18,28 +18,29 @@
 
 <script>
 import TreeTools from './compoents/tree-tools'
+import { getCompanyList } from '@/api/departments'
+import { tranListToTreeData } from '@/utils/index'
 export default {
   components: {
     TreeTools
   },
   data () {
     return {
-      departs: [{
-        name: '玉衡星',
-        children: [{
-          name: '指挥部'
-        }]
-      }, {
-        name: '天权星',
-        manager: '凝光'
-      }, {
-        name: '天枢星'
-      }],
+      departs: [],
       defaultProps: {
         children: 'children',
         label: 'name'
       },
       company: { name: '提瓦特大陆-璃月', manager: '负责人' }
+    }
+  },
+  created () {
+    this.getCompanyLists()
+  },
+  methods: {
+    async getCompanyLists () {
+      const res = await getCompanyList()
+      this.departs = tranListToTreeData(res.depts, '')
     }
   }
 }

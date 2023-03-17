@@ -5,14 +5,14 @@
       <el-row type="flex" justify="end">
         <el-col>{{ treeData.manager }}</el-col>
         <el-col>
-          <el-dropdown>
+          <el-dropdown @command="handleCommand">
             <span class="el-dropdown-link">
               操作<i class="el-icon-arrow-down" />
             </span>
             <el-dropdown-menu slot="dropdown">
-              <el-dropdown-item>添加子部门</el-dropdown-item>
-              <el-dropdown-item v-if="!isDropdownShow">编辑部门</el-dropdown-item>
-              <el-dropdown-item v-if="!isDropdownShow">删除部门</el-dropdown-item>
+              <el-dropdown-item command="add">添加子部门</el-dropdown-item>
+              <el-dropdown-item v-if="!isDropdownShow" command="set">编辑部门</el-dropdown-item>
+              <el-dropdown-item v-if="!isDropdownShow" command="del">删除部门</el-dropdown-item>
             </el-dropdown-menu>
           </el-dropdown>
         </el-col>
@@ -22,6 +22,7 @@
 </template>
 
 <script>
+import { delDepartment } from '@/api/departments'
 export default {
   // 组件名称
   name: 'TreeTools',
@@ -59,7 +60,22 @@ export default {
     */
   mounted () {},
   // 组件方法
-  methods: {}
+  methods: {
+    handleCommand (command) {
+      if (command === 'add') {
+        this.$message('添加')
+      } else if (command === 'set') {
+        this.$message('修改')
+      } else {
+        this.$confirm('是否要删除该部门?').then(() => {
+          return delDepartment(this.treeData.id)
+        }).then(() => {
+          this.$emit('deldepart')
+          this.$message.success('删除成功')
+        })
+      }
+    }
+  }
 }
 </script>
 
