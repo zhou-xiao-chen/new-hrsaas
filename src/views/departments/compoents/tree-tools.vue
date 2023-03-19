@@ -63,7 +63,7 @@ export default {
   methods: {
     handleCommand (command) {
       if (command === 'add') {
-        this.$message('添加')
+        this.$emit('addDialog', this.treeData)
       } else if (command === 'set') {
         this.$message('修改')
       } else {
