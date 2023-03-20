@@ -65,7 +65,7 @@ export default {
       if (command === 'add') {
         this.$emit('addDialog', this.treeData)
       } else if (command === 'set') {
-        this.$message('修改')
+        this.$emit('setDialog', this.treeData)
       } else {
         this.$confirm('是否要删除该部门?').then(() => {
           return delDepartment(this.treeData.id)

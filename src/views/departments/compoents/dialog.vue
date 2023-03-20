@@ -1,6 +1,6 @@
 <template>
-  <el-dialog title="新增部门" :visible="dialogFormVisible">
-    <el-form :model="form" :rules="rules" label-width="120px">
+  <el-dialog :title="showAddorSet" :visible="dialogFormVisible" @close="btnCancel">
+    <el-form ref="departmentForm" :model="form" :rules="rules" label-width="120px">
       <el-form-item label="部门名称" prop="name">
         <el-input v-model="form.name" placeholder="请输入1-50字符" />
       </el-form-item>
@@ -8,21 +8,29 @@
         <el-input v-model="form.code" placeholder="请输入1-50字符" />
       </el-form-item>
       <el-form-item label="部门负责人" prop="manager" placeholder="请选择负责人">
-        <el-select v-model="form.manager" />
+        <el-select v-model="form.manager" @focus="selectResponsiblePerson">
+          <el-option
+            v-for="item in simpleList"
+            :key="item.id"
+            :label="item.username"
+            :value="item.username"
+          />
+        </el-select>
       </el-form-item>
       <el-form-item label="部门介绍" prop="introduce">
         <el-input v-model="form.introduce" type="textarea" placeholder="请输入1-300字符" :rows="3" />
       </el-form-item>
     </el-form>
     <div slot="footer" class="dialog-footer">
-      <el-button>取 消</el-button>
-      <el-button type="primary">确 定</el-button>
+      <el-button @click="btnCancel">取 消</el-button>
+      <el-button type="primary" @click="checkForm">确 定</el-button>
     </div>
   </el-dialog>
 </template>
 
 <script>
-import { getCompanyList } from '@/api/departments'
+import { getCompanyList, addDepartment, setDepartment, putDepartment } from '@/api/departments'
+import { getSimpleList } from '@/api/employees'
 export default {
   // 组件名称
   name: 'AddDialog',
@@ -43,12 +51,22 @@ export default {
   data () {
     const checkName = async (rule, value, callback) => {
       const res = await getCompanyList()
-      const havename = res.depts.filter(item => item.pid === this.treeNode.id).some(item => item.name === value)
+      let havename = null
+      if (this.form.id) {
+        havename = res.depts.filter(item => item.pid === this.treeNode.pid && item.id !== this.treeNode.id).some(item => item.name === value)
+      } else {
+        havename = res.depts.filter(item => item.pid === this.treeNode.id).some(item => item.name === value)
+      }
       havename ? callback(new Error('该名称部门已存在')) : callback()
     }
     const checkCode = async (rule, value, callback) => {
       const res = await getCompanyList()
-      const havecode = res.depts.some(item => item.code === value)
+      let havecode = null
+      if (this.form.id) {
+        havecode = res.depts.filter(item => item.id !== this.treeNode.id).some(item => item.code === value)
+      } else {
+        havecode = res.depts.some(item => item.code === value)
+      }
       havecode ? callback(new Error('部门编码已存在')) : callback()
     }
     return {
@@ -76,11 +94,16 @@ export default {
           { required: true, message: '部门介绍不能为空', trigger: 'blur' },
           { min: 1, max: 300, message: '长度在 1 到 300 个字符', trigger: 'blur' }
         ]
-      }
+      },
+      simpleList: ''
     }
   },
   // 计算属性
-  computed: {},
+  computed: {
+    showAddorSet () {
+      return this.form.id ? '编辑部门' : '添加子部门'
+    }
+  },
   // 侦听器
   watch: {},
   // 生命周期钩子   注：没用到的钩子请自行删除
@@ -94,7 +117,40 @@ export default {
   */
   mounted () {},
   // 组件方法
-  methods: {}
+  methods: {
+    async selectResponsiblePerson () {
+      this.simpleList = await getSimpleList()
+    },
+    async setDepartment (id) {
+      this.form = await setDepartment(id)
+    },
+    checkForm () {
+      this.$refs.departmentForm.validate(async isOK => {
+        if (isOK) {
+          if (this.form.id) {
+            await putDepartment(this.form)
+          } else {
+            await addDepartment({ ...this.form, pid: this.treeNode.id })
+            this.$message.success('添加成功')
+          }
+          this.$emit('update:dialogFormVisible', false)
+          this.$emit('addSuccess')
+        } else {
+          this.$message.error('添加失败')
+        }
+      })
+    },
+    btnCancel () {
+      this.form = {
+        name: '',
+        code: '',
+        manager: '',
+        introduce: ''
+      }
+      this.$refs.departmentForm.resetFields()
+      this.$emit('update:dialogFormVisible', false)
+    }
+  }
 }
 </script>
 

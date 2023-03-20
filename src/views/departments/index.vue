@@ -8,12 +8,12 @@
         <div class="tree-card">
           <TreeTools :tree-data="company" :is-dropdown-show="true" @addDialog="addDepartment" />
           <el-tree :data="departs" :props="defaultProps" :default-expand-all="true">
-            <TreeTools slot-scope="{ data }" :tree-data="data" @deldepart="getCompanyLists" @addDialog="addDepartment" />
+            <TreeTools slot-scope="{ data }" :tree-data="data" @deldepart="getCompanyLists" @addDialog="addDepartment" @setDialog="setDepartment" />
           </el-tree>
         </div>
       </el-card>
     </div>
-    <AddDialog :dialog-form-visible="isAddDialogShow" :tree-node="node" />
+    <AddDialog ref="addDialog" :dialog-form-visible.sync="isAddDialogShow" :tree-node="node" @addSuccess="getCompanyLists" />
   </div>
 </template>
 
@@ -46,11 +46,16 @@ export default {
     async getCompanyLists () {
       const res = await getCompanyList()
       this.departs = tranListToTreeData(res.depts, '')
-      this.company = { name: res.companyName, manager: '负责人' }
+      this.company = { name: res.companyName, manager: '负责人', id: '' }
     },
     addDepartment (treenode) {
       this.isAddDialogShow = true
       this.node = treenode
+    },
+    setDepartment (node) {
+      this.isAddDialogShow = true
+      this.node = node
+      this.$refs.addDialog.setDepartment(node.id)
     }
   }
 }
