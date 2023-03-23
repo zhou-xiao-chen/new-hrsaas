@@ -6,3 +6,18 @@ export function getSimpleList () {
     method: 'GET'
   })
 }
+
+export function getEmployeeList (params) {
+  return request({
+    url: '/sys/user',
+    method: 'GET',
+    params
+  })
+}
+
+export function delEmployees (id) {
+  return request({
+    url: `/sys/user/${id}`,
+    method: 'DELETE'
+  })
+}

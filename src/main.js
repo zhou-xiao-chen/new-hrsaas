@@ -12,7 +12,8 @@ import App from './App'
 import store from './store'
 import router from './router'
 import * as directives from '@/directives'
-
+import * as filtres from '@/filters'
+import Component from '@/components'
 import '@/icons' // icon
 import '@/permission' // permission control
 
@@ -28,13 +29,16 @@ import '@/permission' // permission control
 //   const { mockXHR } = require('../mock')
 //   mockXHR()
 // }
-
+Vue.use(Component)
 // set ElementUI lang to EN
 Vue.use(ElementUI, { locale })
 // 如果想要中文版 element-ui，按如下方式声明
 // Vue.use(ElementUI)
 Object.keys(directives).forEach(key => {
   Vue.directive(key, directives[key])
+})
+Object.keys(filtres).forEach(key => {
+  Vue.filter(key, filtres[key])
 })
 
 Vue.config.productionTip = false
