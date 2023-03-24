@@ -23,6 +23,14 @@ export function addEmployeeList (data) {
   })
 }
 
+export function addEmployeeExcel (data) {
+  return request({
+    url: '/sys/user/batch',
+    method: 'POST',
+    data
+  })
+}
+
 export function delEmployees (id) {
   return request({
     url: `/sys/user/${id}`,
