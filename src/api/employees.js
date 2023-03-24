@@ -15,6 +15,14 @@ export function getEmployeeList (params) {
   })
 }
 
+export function addEmployeeList (data) {
+  return request({
+    url: '/sys/user',
+    method: 'POST',
+    data
+  })
+}
+
 export function delEmployees (id) {
   return request({
     url: `/sys/user/${id}`,

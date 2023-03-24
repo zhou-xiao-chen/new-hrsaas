@@ -6,7 +6,7 @@
         <template #after>
           <el-button size="small" type="warning">导入</el-button>
           <el-button size="small" type="danger">导出</el-button>
-          <el-button size="small" type="primary">新增员工</el-button>
+          <el-button size="small" type="primary" @click="isShowDialog = true">新增员工</el-button>
         </template>
       </page-tools>
       <el-card v-loading="loading">
@@ -47,13 +47,18 @@
         </el-row>
       </el-card>
     </div>
+    <AddEmployee :show-dialog.sync="isShowDialog" />
   </div>
 </template>
 
 <script>
 import { getEmployeeList, delEmployees } from '@/api/employees'
 import EmployeeEnum from '@/api/constant/employees'
+import AddEmployee from './components/add-employee'
 export default {
+  components: {
+    AddEmployee
+  },
   data () {
     return {
       list: [],
@@ -62,7 +67,8 @@ export default {
         size: 10,
         total: 0
       },
-      loading: false
+      loading: false,
+      isShowDialog: false
     }
   },
   created () {
